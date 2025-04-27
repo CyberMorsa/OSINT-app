@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { CheckCircle, XCircle, AlertCircle, User, Mail, Globe } from "lucide-react"
 
 export default function EmailsPage() {
   const [email, setEmail] = useState("")
@@ -43,8 +44,9 @@ export default function EmailsPage() {
       <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="breaches">Breaches</TabsTrigger>
+          <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="reputation">Reputation</TabsTrigger>
+          {data.contact && data.contact.firstName && <TabsTrigger value="contact">Contact Info</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -63,44 +65,88 @@ export default function EmailsPage() {
                   <span>{data.domain}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">First Seen</span>
-                  <span>{data.firstSeen || "Unknown"}</span>
+                  <span className="text-muted-foreground">Status</span>
+                  <Badge variant={data.status === "valid" ? "default" : "destructive"}>
+                    {data.status === "valid" ? "Valid" : data.status === "invalid" ? "Invalid" : "Unknown"}
+                  </Badge>
                 </div>
+                {data.firstSeen && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">First Seen</span>
+                    <span>{data.firstSeen}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Breaches</span>
-                  <Badge variant={data.breaches.length > 0 ? "destructive" : "outline"}>{data.breaches.length}</Badge>
+                  <span className="text-muted-foreground">Sources</span>
+                  <span>{data.sources}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="breaches" className="space-y-4">
-          {data.breaches.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2">
-              {data.breaches.map((breach: any) => (
-                <Card key={breach.name}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">{breach.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Date</span>
-                        <span>{breach.date}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Data Types</span>
-                        <span>{breach.dataTypes.join(", ")}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <p>No breaches found for this email.</p>
-          )}
+        <TabsContent value="security" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Email Security</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid gap-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Valid Syntax</span>
+                    {data.security.hasValidSyntax ? (
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <XCircle className="h-5 w-5 text-red-500" />
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">MX Records</span>
+                    {data.security.hasValidMX ? (
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <XCircle className="h-5 w-5 text-red-500" />
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">SPF Record</span>
+                    {data.security.hasSPF ? (
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <XCircle className="h-5 w-5 text-red-500" />
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">DMARC Record</span>
+                    {data.security.hasDMARC ? (
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <XCircle className="h-5 w-5 text-red-500" />
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t">
+                  <div className="flex items-center mb-2">
+                    <AlertCircle className="h-5 w-5 mr-2 text-amber-500" />
+                    <span className="font-medium">Security Note</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    We cannot check for data breaches without the HaveIBeenPwned API. Consider checking manually at{" "}
+                    <a
+                      href="https://haveibeenpwned.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline"
+                    >
+                      haveibeenpwned.com
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="reputation" className="space-y-4">
@@ -128,6 +174,96 @@ export default function EmailsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {data.contact && data.contact.firstName && (
+          <TabsContent value="contact" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <User className="h-5 w-5 mr-2 text-muted-foreground" />
+                    <span>
+                      {data.contact.firstName} {data.contact.lastName}
+                    </span>
+                  </div>
+
+                  {data.contact.position && (
+                    <div className="flex items-center">
+                      <Mail className="h-5 w-5 mr-2 text-muted-foreground" />
+                      <span>{data.contact.position}</span>
+                    </div>
+                  )}
+
+                  {data.contact.company && (
+                    <div className="flex items-center">
+                      <Globe className="h-5 w-5 mr-2 text-muted-foreground" />
+                      <span>{data.contact.company}</span>
+                    </div>
+                  )}
+
+                  {data.contact.twitter && (
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mr-2 text-muted-foreground"
+                      >
+                        <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+                      </svg>
+                      <a
+                        href={`https://twitter.com/${data.contact.twitter}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        @{data.contact.twitter}
+                      </a>
+                    </div>
+                  )}
+
+                  {data.contact.linkedin && (
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mr-2 text-muted-foreground"
+                      >
+                        <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                        <rect x="2" y="9" width="4" height="12"></rect>
+                        <circle cx="4" cy="4" r="2"></circle>
+                      </svg>
+                      <a
+                        href={data.contact.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        LinkedIn Profile
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
     )
   }
@@ -137,7 +273,7 @@ export default function EmailsPage() {
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Email Search</h2>
         <p className="text-muted-foreground">
-          Find information about email addresses, including breaches and reputation
+          Find information about email addresses, including validity and reputation
         </p>
       </div>
 

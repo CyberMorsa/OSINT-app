@@ -9,31 +9,48 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Aquí normalmente llamaríamos a una API externa como Sherlock o Maigret
+    // Aquí normalmente llamaríamos a herramientas como Sherlock o Maigret
     // Por ahora, simularemos algunos resultados
 
-    // Simulación de búsqueda en plataformas sociales
+    // Plataformas populares para buscar
     const platforms = [
-      "Twitter",
-      "Instagram",
-      "Facebook",
-      "LinkedIn",
-      "GitHub",
-      "Reddit",
-      "TikTok",
-      "YouTube",
-      "Pinterest",
-      "Snapchat",
+      { name: "Twitter", domain: "twitter.com", probability: 0.8 },
+      { name: "Instagram", domain: "instagram.com", probability: 0.8 },
+      { name: "Facebook", domain: "facebook.com", probability: 0.7 },
+      { name: "LinkedIn", domain: "linkedin.com", probability: 0.6 },
+      { name: "GitHub", domain: "github.com", probability: 0.5 },
+      { name: "Reddit", domain: "reddit.com", probability: 0.6 },
+      { name: "TikTok", domain: "tiktok.com", probability: 0.7 },
+      { name: "YouTube", domain: "youtube.com", probability: 0.5 },
+      { name: "Pinterest", domain: "pinterest.com", probability: 0.4 },
+      { name: "Snapchat", domain: "snapchat.com", probability: 0.3 },
+      { name: "Medium", domain: "medium.com", probability: 0.4 },
+      { name: "Twitch", domain: "twitch.tv", probability: 0.5 },
+      { name: "Telegram", domain: "t.me", probability: 0.3 },
+      { name: "Spotify", domain: "open.spotify.com/user", probability: 0.4 },
+      { name: "SoundCloud", domain: "soundcloud.com", probability: 0.3 },
     ]
 
-    // Simular resultados aleatorios para demostración
+    // Generar resultados basados en probabilidades
     const profiles = platforms.map((platform) => {
-      const found = Math.random() > 0.3 // 70% de probabilidad de encontrar
+      const found = Math.random() < platform.probability
+      let url = ""
+
+      if (found) {
+        if (platform.name === "Telegram") {
+          url = `https://${platform.domain}/${username}`
+        } else if (platform.name === "Spotify") {
+          url = `https://${platform.domain}/${username}`
+        } else {
+          url = `https://${platform.domain}/${username}`
+        }
+      }
+
       return {
-        platform,
+        platform: platform.name,
         username: found ? username : null,
         found,
-        url: found ? `https://${platform.toLowerCase()}.com/${username}` : null,
+        url: found ? url : null,
       }
     })
 

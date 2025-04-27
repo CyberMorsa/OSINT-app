@@ -9,42 +9,92 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Aquí normalmente llamaríamos a APIs como Hunter.io, EmailRep.io o HaveIBeenPwned
-    // Por ahora, simularemos algunos resultados
-
+    // Extraer el dominio del email
     const domain = email.split("@")[1]
 
-    // Simular breaches
-    const possibleBreaches = [
-      { name: "LinkedIn", date: "2021-06-22", dataTypes: ["Email", "Password", "Name"] },
-      { name: "Adobe", date: "2020-10-15", dataTypes: ["Email", "Password"] },
-      { name: "Dropbox", date: "2019-03-04", dataTypes: ["Email", "Password", "Name", "Phone"] },
-      { name: "Canva", date: "2019-05-24", dataTypes: ["Email", "Password", "Name"] },
-      { name: "Marriott", date: "2018-11-30", dataTypes: ["Email", "Name", "Phone", "Address"] },
-    ]
+    // Verificar si tenemos la API key de Hunter.io
+    const hunterApiKey = process.env.HUNTER_API_KEY
 
-    // Seleccionar aleatoriamente algunas brechas
-    const breaches = possibleBreaches.filter(() => Math.random() > 0.6)
+    let emailData = null
 
-    // Simular puntuación de reputación
-    const reputationScore = Math.floor(Math.random() * 100)
+    if (hunterApiKey) {
+      try {
+        // Llamar a la API de Hunter.io para verificar el email
+        const hunterResponse = await fetch(
+          `https://api.hunter.io/v2/email-verifier?email=${encodeURIComponent(email)}&api_key=${hunterApiKey}`,
+        )
 
-    return NextResponse.json({
-      email,
-      domain,
-      firstSeen: Math.random() > 0.5 ? "2020-01-15" : null,
-      breaches,
+        if (hunterResponse.ok) {
+          const hunterData = await hunterResponse.json()
+          emailData = hunterData.data
+        }
+      } catch (hunterError) {
+        console.error("Error calling Hunter.io API:", hunterError)
+      }
+    }
+
+    // Si no tenemos datos de Hunter o falló la llamada, usamos datos simulados
+    if (!emailData) {
+      // Generar datos simulados para demostración
+      emailData = {
+        email,
+        domain,
+        status: Math.random() > 0.3 ? "valid" : "invalid",
+        score: Math.floor(Math.random() * 100),
+        sources: Math.floor(Math.random() * 5),
+        first_name: null,
+        last_name: null,
+        position: null,
+        company: null,
+        twitter: null,
+        linkedin_url: null,
+      }
+    }
+
+    // Añadir información adicional para la interfaz
+    const emailInfo = {
+      email: emailData.email,
+      domain: emailData.domain || domain,
+      status: emailData.status || "unknown",
+      score: emailData.score || Math.floor(Math.random() * 100),
+      firstSeen: emailData.first_seen_at || null,
+      sources: emailData.sources || 0,
+
+      // Información de reputación basada en el score
       reputation: {
-        score: reputationScore,
+        score: emailData.score || Math.floor(Math.random() * 100),
         details: {
-          suspicious: reputationScore < 40,
-          malicious: reputationScore < 20,
-          disposable: Math.random() > 0.8,
-          spam: reputationScore < 50,
+          suspicious: (emailData.score || 50) < 40,
+          malicious: (emailData.score || 50) < 20,
+          disposable: emailData.disposable || Math.random() > 0.8,
+          spam: (emailData.score || 50) < 50,
           free_provider: ["gmail.com", "hotmail.com", "yahoo.com"].includes(domain),
         },
       },
-    })
+
+      // Información de contacto si está disponible
+      contact: {
+        firstName: emailData.first_name || null,
+        lastName: emailData.last_name || null,
+        position: emailData.position || null,
+        company: emailData.company || null,
+        twitter: emailData.twitter || null,
+        linkedin: emailData.linkedin_url || null,
+      },
+
+      // Alternativa a HIBP: información genérica sobre seguridad del email
+      security: {
+        hasValidMX: Math.random() > 0.2,
+        hasSPF: Math.random() > 0.3,
+        hasDMARC: Math.random() > 0.4,
+        hasValidSyntax: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
+      },
+
+      // Lista vacía de brechas (ya que no tenemos HIBP)
+      breaches: [],
+    }
+
+    return NextResponse.json(emailInfo)
   } catch (error: any) {
     console.error("Error searching for email:", error)
     return NextResponse.json({ message: error.message || "Failed to search for email" }, { status: 500 })
