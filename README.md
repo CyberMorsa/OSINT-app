@@ -9,6 +9,15 @@ Una aplicación web para realizar investigaciones OSINT (Open Source Intelligenc
 - Información sobre números de teléfono
 - Escaneo de redes locales
 - Sistema de autenticación
+- Integración con APIs públicas gratuitas
+
+## APIs Integradas
+
+- Clearbit Logo API - Obtener logos de empresas
+- IP Geolocation by IPwhois - Información de geolocalización de IP
+- HaveIBeenEmulated - Verificar si un email ha sido filtrado
+- GitHub Search API - Buscar usuarios en GitHub
+- AbuseIPDB - Comprobar si una IP ha sido reportada por abuso
 
 ## Despliegue en Vercel
 
@@ -16,18 +25,6 @@ Una aplicación web para realizar investigaciones OSINT (Open Source Intelligenc
 2. Crea un nuevo proyecto en [Vercel](https://vercel.com)
 3. Conecta tu repositorio
 4. Configura las siguientes variables de entorno:
-
-\`\`\`
-ADMIN_USERNAME=Admin
-ADMIN_PASSWORD=Admin
-GUEST_USERNAME=Guest
-GUEST_PASSWORD=Guest
-TRUECALLER_API_KEY=your_truecaller_api_key
-NUMVERIFY_API_KEY=your_numverify_api_key
-HUNTER_API_KEY=your_hunter_api_key
-EMAILREP_API_KEY=your_emailrep_api_key
-HIBP_API_KEY=your_haveibeenpwned_api_key
-\`\`\`
 
 5. Despliega la aplicación
 
@@ -39,45 +36,14 @@ HIBP_API_KEY=your_haveibeenpwned_api_key
 4. Inicia el servidor de desarrollo: `npm run dev`
 5. Abre [http://localhost:3000](http://localhost:3000) en tu navegador
 
+## Credenciales por defecto
+
+- Admin: Cybermorsa / Cybermorsa
+- Invitado: Guest / Guest
+
 ## Licencia
 
 MIT
 \`\`\`
 
-Vamos a crear un archivo `.gitignore` para evitar subir archivos innecesarios:
-
-```txt file=".gitignore"
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env*.local
-.env
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+Vamos a actualizar el package.json para asegurarnos de que todas las dependencias estén correctamente configuradas:

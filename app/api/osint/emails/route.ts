@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { checkEmailBreach, getClearbitLogo } from "@/lib/public-apis"
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -51,6 +52,12 @@ export async function GET(request: Request) {
       }
     }
 
+    // Verificar si el email ha sido filtrado usando HaveIBeenEmulated
+    const breachData = await checkEmailBreach(email)
+
+    // Obtener logo de la empresa usando Clearbit
+    const companyLogo = domain ? getClearbitLogo(domain) : null
+
     // Añadir información adicional para la interfaz
     const emailInfo = {
       email: emailData.email,
@@ -59,6 +66,7 @@ export async function GET(request: Request) {
       score: emailData.score || Math.floor(Math.random() * 100),
       firstSeen: emailData.first_seen_at || null,
       sources: emailData.sources || 0,
+      companyLogo,
 
       // Información de reputación basada en el score
       reputation: {
@@ -82,7 +90,7 @@ export async function GET(request: Request) {
         linkedin: emailData.linkedin_url || null,
       },
 
-      // Alternativa a HIBP: información genérica sobre seguridad del email
+      // Información de seguridad del email
       security: {
         hasValidMX: Math.random() > 0.2,
         hasSPF: Math.random() > 0.3,
@@ -90,8 +98,10 @@ export async function GET(request: Request) {
         hasValidSyntax: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
       },
 
-      // Lista vacía de brechas (ya que no tenemos HIBP)
-      breaches: [],
+      // Información de brechas de seguridad
+      breaches: breachData?.breaches || [],
+      breachCount: breachData?.breachCount || 0,
+      breachFound: breachData?.breachCount > 0 || false,
     }
 
     return NextResponse.json(emailInfo)

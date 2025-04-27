@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { searchGitHubUser } from "@/lib/public-apis"
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -184,6 +185,19 @@ export async function GET(request: Request) {
       }
     })
 
+    // Buscar información real de GitHub usando la API pública
+    const githubInfo = await searchGitHubUser(username)
+
+    // Si encontramos el perfil de GitHub, actualizar el resultado correspondiente
+    if (githubInfo.found) {
+      const githubIndex = profiles.findIndex((p) => p.platform === "GitHub")
+      if (githubIndex !== -1) {
+        profiles[githubIndex].found = true
+        profiles[githubIndex].username = username
+        profiles[githubIndex].url = `https://github.com/${username}`
+      }
+    }
+
     return NextResponse.json({
       username,
       profiles: profiles.sort((a, b) => {
@@ -195,6 +209,7 @@ export async function GET(request: Request) {
       scanTime: new Date().toISOString(),
       totalFound: profiles.filter((p) => p.found).length,
       totalChecked: profiles.length,
+      githubInfo: githubInfo.found ? githubInfo : null,
     })
   } catch (error: any) {
     console.error("Error searching for username:", error)

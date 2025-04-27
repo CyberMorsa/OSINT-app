@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CheckCircle, XCircle, AlertCircle, User, Mail, Globe } from "lucide-react"
+import { CheckCircle, XCircle, AlertCircle, User, Mail, Globe, ExternalLink } from "lucide-react"
+import Link from "next/link"
 
 export default function EmailsPage() {
   const [email, setEmail] = useState("")
@@ -46,39 +47,55 @@ export default function EmailsPage() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
           <TabsTrigger value="reputation">Reputation</TabsTrigger>
+          {data.breachFound && <TabsTrigger value="breaches">Breaches</TabsTrigger>}
           {data.contact && data.contact.firstName && <TabsTrigger value="contact">Contact Info</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Email Information</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle>Email Information</CardTitle>
+                {data.companyLogo && (
+                  <div className="h-8 w-8 overflow-hidden rounded-md">
+                    <img
+                      src={data.companyLogo || "/placeholder.svg"}
+                      alt={`${data.domain} logo`}
+                      className="h-full w-full object-contain"
+                      onError={(e) => {
+                        // Hide the image if it fails to load
+                        ;(e.target as HTMLImageElement).style.display = "none"
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               <div className="grid gap-2">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Email</span>
-                  <span>{data.email}</span>
+                  <span className="data-label">Email</span>
+                  <span className="data-value">{data.email}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Domain</span>
-                  <span>{data.domain}</span>
+                  <span className="data-label">Domain</span>
+                  <span className="data-value">{data.domain}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Status</span>
+                  <span className="data-label">Status</span>
                   <Badge variant={data.status === "valid" ? "default" : "destructive"}>
                     {data.status === "valid" ? "Valid" : data.status === "invalid" ? "Invalid" : "Unknown"}
                   </Badge>
                 </div>
                 {data.firstSeen && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">First Seen</span>
-                    <span>{data.firstSeen}</span>
+                    <span className="data-label">First Seen</span>
+                    <span className="data-value">{data.firstSeen}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Sources</span>
-                  <span>{data.sources}</span>
+                  <span className="data-label">Sources</span>
+                  <span className="data-value">{data.sources}</span>
                 </div>
               </div>
             </CardContent>
@@ -174,6 +191,48 @@ export default function EmailsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {data.breachFound && (
+          <TabsContent value="breaches" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Data Breaches</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {data.breaches && data.breaches.length > 0 ? (
+                  data.breaches.map((breach: any) => (
+                    <div key={breach.Name} className="border rounded-md p-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold">{breach.Name}</h3>
+                        <Link
+                          href={`https://haveibeenpwned.com/PwnedWebsite/${breach.Name}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:underline flex items-center gap-1"
+                        >
+                          Learn More
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2">{breach.Description}</p>
+                      <div className="mt-2">
+                        <span className="text-xs text-gray-500">Compromised Data:</span>
+                        <ul className="list-disc list-inside text-sm">
+                          {breach.DataClasses.map((dataClass: string) => (
+                            <li key={dataClass}>{dataClass}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">Breach Date: {breach.BreachDate}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p>No breach data found for this email.</p>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
 
         {data.contact && data.contact.firstName && (
           <TabsContent value="contact" className="space-y-4">

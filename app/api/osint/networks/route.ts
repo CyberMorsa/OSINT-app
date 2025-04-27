@@ -1,7 +1,27 @@
 import { NextResponse } from "next/server"
+import { getLocalNetworkDevices } from "@/lib/public-apis"
 
 export async function GET() {
   try {
+    // Intentar obtener información real de dispositivos en la red
+    const realDevices = await getLocalNetworkDevices()
+
+    // Explicación para el usuario sobre las limitaciones
+    const networkScanExplanation = {
+      message: "Información importante sobre el escaneo de red",
+      details: [
+        "El escaneo de red completo no es posible directamente desde un navegador web debido a restricciones de seguridad.",
+        "Para obtener información real de dispositivos conectados, necesitarías ejecutar un servidor local con herramientas como nmap.",
+        "Los datos mostrados son simulados para fines de demostración.",
+        "Para una implementación real, considera usar una aplicación de escritorio o un servidor local.",
+      ],
+      alternatives: [
+        "Usar herramientas como Advanced IP Scanner, Angry IP Scanner o Fing Desktop",
+        "Configurar un servidor local con nmap y crear una API que se comunique con tu aplicación web",
+        "Acceder directamente a la interfaz de administración de tu router",
+      ],
+    }
+
     // Aquí normalmente llamaríamos a herramientas como Nmap o arp-scan
     // Por ahora, simularemos resultados más detallados
 
@@ -100,63 +120,6 @@ export async function GET() {
       { prefix: "00:23:69", name: "Cisco-Linksys" },
       { prefix: "00:25:9C", name: "Cisco-Linksys" },
       { prefix: "00:1A:70", name: "Cisco-Linksys" },
-      { prefix: "00:0F:66", name: "Cisco-Linksys" },
-      { prefix: "00:13:10", name: "Cisco-Linksys" },
-      { prefix: "00:18:F8", name: "Cisco-Linksys" },
-      { prefix: "00:1E:E5", name: "Cisco-Linksys" },
-      { prefix: "00:21:29", name: "Cisco-Linksys" },
-      { prefix: "00:23:69", name: "Cisco-Linksys" },
-      { prefix: "00:25:9C", name: "Cisco-Linksys" },
-      { prefix: "00:1A:70", name: "Cisco-Linksys" },
-      { prefix: "00:0F:66", name: "Cisco-Linksys" },
-      { prefix: "00:13:10", name: "Cisco-Linksys" },
-      { prefix: "00:18:F8", name: "Cisco-Linksys" },
-      { prefix: "00:1E:E5", name: "Cisco-Linksys" },
-      { prefix: "00:21:29", name: "Cisco-Linksys" },
-      { prefix: "00:23:69", name: "Cisco-Linksys" },
-      { prefix: "00:25:9C", name: "Cisco-Linksys" },
-      { prefix: "00:1A:70", name: "Cisco-Linksys" },
-      { prefix: "00:0F:66", name: "Cisco-Linksys" },
-      { prefix: "00:13:10", name: "Cisco-Linksys" },
-      { prefix: "00:18:F8", name: "Cisco-Linksys" },
-      { prefix: "00:1E:E5", name: "Cisco-Linksys" },
-      { prefix: "00:21:29", name: "Cisco-Linksys" },
-      { prefix: "00:23:69", name: "Cisco-Linksys" },
-      { prefix: "00:25:9C", name: "Cisco-Linksys" },
-      { prefix: "00:1A:70", name: "Cisco-Linksys" },
-      { prefix: "00:0F:66", name: "Cisco-Linksys" },
-      { prefix: "00:13:10", name: "Cisco-Linksys" },
-      { prefix: "00:18:F8", name: "Cisco-Linksys" },
-      { prefix: "00:1E:E5", name: "Cisco-Linksys" },
-      { prefix: "00:21:29", name: "Cisco-Linksys" },
-      { prefix: "00:23:69", name: "Cisco-Linksys" },
-      { prefix: "00:25:9C", name: "Cisco-Linksys" },
-      { prefix: "00:1A:70", name: "Cisco-Linksys" },
-      { prefix: "00:0F:66", name: "Cisco-Linksys" },
-      { prefix: "00:13:10", name: "Cisco-Linksys" },
-      { prefix: "00:18:F8", name: "Cisco-Linksys" },
-      { prefix: "00:1E:E5", name: "Cisco-Linksys" },
-      { prefix: "00:21:29", name: "Cisco-Linksys" },
-      { prefix: "00:23:69", name: "Cisco-Linksys" },
-      { prefix: "00:25:9C", name: "Cisco-Linksys" },
-      { prefix: "00:1A:70", name: "Cisco-Linksys" },
-      { prefix: "00:0F:66", name: "Cisco-Linksys" },
-      { prefix: "00:13:10", name: "Cisco-Linksys" },
-      { prefix: "00:18:F8", name: "Cisco-Linksys" },
-      { prefix: "00:1E:E5", name: "Cisco-Linksys" },
-      { prefix: "00:21:29", name: "Cisco-Linksys" },
-      { prefix: "00:23:69", name: "Cisco-Linksys" },
-      { prefix: "00:25:9C", name: "Cisco-Linksys" },
-      { prefix: "00:1A:70", name: "Cisco-Linksys" },
-      { prefix: "00:0F:66", name: "Cisco-Linksys" },
-      { prefix: "00:13:10", name: "Cisco-Linksys" },
-      { prefix: "00:18:F8", name: "Cisco-Linksys" },
-      { prefix: "00:1E:E5", name: "Cisco-Linksys" },
-      { prefix: "00:21:29", name: "Cisco-Linksys" },
-      { prefix: "00:23:69", name: "Cisco-Linksys" },
-      { prefix: "00:21:29", name: "Cisco-Linksys" },
-      { prefix: "00:23:69", name: "Cisco-Linksys" },
-      { prefix: "00:25:9C", name: "Cisco-Linksys" },
     ]
 
     // Generar entre 5 y 15 dispositivos
@@ -312,6 +275,7 @@ export async function GET() {
     })
 
     return NextResponse.json({
+      explanation: networkScanExplanation,
       network: {
         name: "Home Network",
         ipRange: "192.168.1.0/24",
@@ -323,6 +287,7 @@ export async function GET() {
       devices,
       deviceTypes: deviceTypeCount,
       vulnerabilities,
+      realDevicesInfo: realDevices,
     })
   } catch (error: any) {
     console.error("Error scanning network:", error)

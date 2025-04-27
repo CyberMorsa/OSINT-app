@@ -74,3 +74,164 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Animaciones personalizadas */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Clases de utilidad para animaciones */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-slide-in {
+  animation: slideInUp 0.5s ease-out;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Mejoras de accesibilidad */
+.focus-visible:focus-visible {
+  @apply outline-none ring-2 ring-offset-2 ring-primary;
+}
+
+/* Mejoras para enlaces */
+.link {
+  @apply text-primary hover:text-primary/80 underline-offset-4 hover:underline transition-colors;
+}
+
+/* Tarjetas con hover effect */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* Mejoras para badges */
+.badge-found {
+  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100;
+}
+
+.badge-not-found {
+  @apply bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300;
+}
+
+/* Mejoras para botones */
+.btn-primary {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90 transition-colors;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors;
+}
+
+/* Mejoras para tablas */
+.table-row-alt {
+  @apply even:bg-muted/50;
+}
+
+/* Mejoras para tooltips */
+.tooltip {
+  @apply relative inline-block;
+}
+
+.tooltip .tooltip-text {
+  @apply invisible absolute z-10 p-2 text-sm text-white bg-gray-900 rounded-md opacity-0 transition-opacity duration-300;
+  width: 120px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px;
+  margin-bottom: 5px;
+}
+
+.tooltip:hover .tooltip-text {
+  @apply visible opacity-100;
+}
+
+/* Mejoras para la visualización de datos */
+.data-label {
+  @apply text-sm font-medium text-muted-foreground;
+}
+
+.data-value {
+  @apply font-medium;
+}
+
+/* Mejoras para la visualización de resultados */
+.result-card {
+  @apply border rounded-lg p-4 transition-all duration-300 hover:shadow-md;
+}
+
+.result-found {
+  @apply border-l-4 border-l-green-500;
+}
+
+.result-not-found {
+  @apply border-l-4 border-l-gray-300;
+}
+
+/* Mejoras para la visualización de iconos */
+.icon-container {
+  @apply flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary;
+}
+
+/* Mejoras para la visualización de progreso */
+.progress-container {
+  @apply w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden;
+}
+
+.progress-bar {
+  @apply h-2.5 rounded-full transition-all duration-500;
+}
+
+/* Skip to content link for accessibility */
+.skip-to-content {
+  @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-background p-2 rounded-md;
+}
